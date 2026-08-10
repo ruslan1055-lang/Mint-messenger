@@ -656,15 +656,25 @@ window.doRegister = async function() {
   if (pass !== pass2) { err.textContent = 'Пароли не совпадают.'; return; }
   if (pass.length < 6) { err.textContent = 'Пароль минимум 6 символов.'; return; }
 
-  // Check username uniqueness
-  const uSnap = await getDocs(query(collection(db, 'users'), where('username', '==', username)));
-  if (!uSnap.empty) { err.textContent = 'Этот никнейм уже занят.'; return; }
-
   const btn = document.getElementById('regBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+
   try {
+    // 1. Create Firebase Auth user
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: username });
+
+    // 2. Check username uniqueness AFTER auth (rules require isAuth)
+    const uSnap = await getDocs(query(collection(db, 'users'), where('username', '==', username)));
+    if (!uSnap.empty && uSnap.docs[0].id !== cred.user.uid) {
+      // Username taken — delete the just-created auth user and bail
+      await cred.user.delete();
+      err.textContent = 'Этот никнейм уже занят.';
+      btn.disabled = false; btn.textContent = 'Создать аккаунт';
+      return;
+    }
+
+    // 3. Write user profile
     await setDoc(doc(db, 'users', cred.user.uid), {
       uid: cred.user.uid,
       username,
@@ -673,8 +683,10 @@ window.doRegister = async function() {
       createdAt: serverTimestamp(),
       online: true
     });
+    // onAuthStateChanged will take it from here
   } catch(e) {
-    err.textContent = firebaseErrMsg(e.code);
+    console.error('Register error:', e);
+    err.textContent = firebaseErrMsg(e.code) || e.message;
     btn.disabled = false; btn.textContent = 'Создать аккаунт';
   }
 };
@@ -699,7 +711,7 @@ window.doLogin = async function() {
 /* ── LOGOUT ── */
 window.doLogout = async function() {
   if (currentUser) {
-    await updateDoc(doc(db, 'users', currentUser.uid), { online: false });
+    await updateDoc(doc(db, 'users', currentUser.uid), { online: false }).catch(() => {});
   }
   await signOut(auth);
 };
@@ -708,9 +720,22 @@ window.doLogout = async function() {
 onAuthStateChanged(auth, async user => {
   currentUser = user;
   if (user) {
-    const snap = await getDoc(doc(db, 'users', user.uid));
-    currentUserData = snap.exists() ? snap.data() : { username: user.displayName || user.email, avatar: null };
-    await updateDoc(doc(db, 'users', user.uid), { online: true }).catch(()=>{});
+    // Retry a few times in case Firestore doc isn't written yet (race condition after register)
+    let snap = null;
+    for (let i = 0; i < 5; i++) {
+      snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) break;
+      await new Promise(r => setTimeout(r, 600));
+    }
+    currentUserData = snap && snap.exists()
+      ? snap.data()
+      : { username: user.displayName || user.email, avatar: null };
+
+    // online status — only update if we own the doc (safe with our rules)
+    if (snap && snap.exists()) {
+      updateDoc(doc(db, 'users', user.uid), { online: true }).catch(() => {});
+    }
+
     renderProfile();
     listenChats();
   } else {
@@ -762,13 +787,18 @@ window.updateUsername = async function() {
   const ok  = document.getElementById('usernameOk');
   ok.textContent = '';
   if (!/^[a-z0-9_]{3,20}$/.test(val)) { ok.style.color='#fb7185'; ok.textContent='Некорректный никнейм.'; return; }
-  const uSnap = await getDocs(query(collection(db,'users'), where('username','==',val)));
-  if (!uSnap.empty && uSnap.docs[0].id !== currentUser.uid) { ok.style.color='#fb7185'; ok.textContent='Никнейм уже занят.'; return; }
-  await updateDoc(doc(db,'users',currentUser.uid),{ username: val });
-  currentUserData.username = val;
-  ok.style.color=''; ok.textContent = '✓ Сохранено';
-  renderProfile();
-  setTimeout(()=>{ ok.textContent=''; }, 2500);
+  try {
+    const uSnap = await getDocs(query(collection(db,'users'), where('username','==',val)));
+    if (!uSnap.empty && uSnap.docs[0].id !== currentUser.uid) { ok.style.color='#fb7185'; ok.textContent='Никнейм уже занят.'; return; }
+    await updateDoc(doc(db,'users',currentUser.uid),{ username: val });
+    currentUserData.username = val;
+    ok.style.color='var(--teal)'; ok.textContent = '✓ Сохранено';
+    renderProfile();
+    setTimeout(()=>{ ok.textContent=''; }, 2500);
+  } catch(e) {
+    console.error('updateUsername error:', e);
+    ok.style.color='#fb7185'; ok.textContent = 'Ошибка: ' + (e.message || e.code);
+  }
 };
 
 /* ── AVATAR ── */
