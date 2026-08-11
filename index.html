@@ -951,34 +951,43 @@ window.searchUsers = function() {
 
 /* ── START CHAT ── */
 window.startChatWith = async function(otherUid, otherName) {
-  if (!currentUser) return;
+  if (!currentUser) { alert('Войдите в аккаунт'); return; }
   document.getElementById('searchUserInp').value = '';
   document.getElementById('userSearchResults').innerHTML = '';
 
-  // Check if chat already exists
-  const chatId1 = currentUser.uid + '_' + otherUid;
-  const chatId2 = otherUid + '_' + currentUser.uid;
-  let chatId = null;
+  // Детерминированный chatId: сортируем uid — один и тот же ID для обоих участников
+  const ids = [currentUser.uid, otherUid].sort();
+  const chatId = ids[0] + '_' + ids[1];
 
-  const snap1 = await getDoc(doc(db,'chats',chatId1));
-  if (snap1.exists()) { chatId = chatId1; }
-  else {
-    const snap2 = await getDoc(doc(db,'chats',chatId2));
-    if (snap2.exists()) { chatId = chatId2; }
-  }
+  try {
+    const snap = await getDoc(doc(db,'chats',chatId));
+    if (!snap.exists()) {
+      let otherAvatar = null;
+      try {
+        const otherSnap = await getDoc(doc(db,'users',otherUid));
+        if (otherSnap.exists()) otherAvatar = otherSnap.data().avatar || null;
+      } catch(e2) {}
 
-  if (!chatId) {
-    chatId = chatId1;
-    await setDoc(doc(db,'chats',chatId), {
-      participants: [currentUser.uid, otherUid],
-      participantNames: { [currentUser.uid]: currentUserData.username, [otherUid]: otherName },
-      participantAvatars: { [currentUser.uid]: currentUserData.avatar||null, [otherUid]: null },
-      lastMessage: '',
-      lastAt: serverTimestamp(),
-      createdAt: serverTimestamp()
-    });
+      await setDoc(doc(db,'chats',chatId), {
+        participants: [currentUser.uid, otherUid],
+        participantNames: {
+          [currentUser.uid]: currentUserData.username,
+          [otherUid]: otherName
+        },
+        participantAvatars: {
+          [currentUser.uid]: currentUserData.avatar || null,
+          [otherUid]: otherAvatar
+        },
+        lastMessage: '',
+        lastAt: serverTimestamp(),
+        createdAt: serverTimestamp()
+      });
+    }
+    openChat(chatId, otherName, otherUid);
+  } catch(e) {
+    console.error('startChatWith error:', e);
+    alert('Не удалось открыть чат: ' + (e.message || e.code));
   }
-  openChat(chatId, otherName, otherUid);
 };
 
 /* ── LISTEN CHATS ── */
@@ -1106,31 +1115,37 @@ window.sendMsg = async function() {
 
   // Send text message
   if (text) {
-    const msgData = { uid: currentUser.uid, text, createdAt: serverTimestamp() };
-    await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
-    await updateDoc(doc(db,'chats',activeChatId), { lastMessage: text, lastAt: serverTimestamp() });
+    try {
+      const msgData = { uid: currentUser.uid, text, createdAt: serverTimestamp() };
+      await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
+      await updateDoc(doc(db,'chats',activeChatId), { lastMessage: text, lastAt: serverTimestamp() });
+    } catch(e) {
+      console.error('sendMsg text error:', e);
+      alert('Ошибка отправки: ' + (e.message || e.code));
+    }
   }
 
   // Send media
   for (const item of mediaCopy) {
     try {
-      const ext = item.file.name.split('.').pop();
       const storageRef = ref(storage, `chats/${activeChatId}/${Date.now()}_${item.file.name}`);
       await uploadBytes(storageRef, item.file);
       const mediaUrl = await getDownloadURL(storageRef);
+      const preview = item.type==='image' ? '📷 Фото' : item.type==='audio' ? '🎵 Аудио' : ('📄 ' + item.file.name);
+      // text поле обязательно по правилам Firestore — ставим preview как текст
       const msgData = {
         uid: currentUser.uid,
-        text: '',
+        text: preview,
         mediaType: item.type,
         mediaUrl,
         fileName: item.file.name,
         createdAt: serverTimestamp()
       };
       await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
-      const preview = item.type==='image' ? '📷 Фото' : item.type==='audio' ? '🎵 Аудио' : `📄 ${item.file.name}`;
       await updateDoc(doc(db,'chats',activeChatId), { lastMessage: preview, lastAt: serverTimestamp() });
     } catch(err) {
       console.error('Media upload error:', err);
+      alert('Ошибка загрузки файла: ' + (err.message || err.code));
     }
   }
 };
