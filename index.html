@@ -245,7 +245,7 @@ header {
 .empty-state svg { opacity: .35; }
 
 /* CHATS */
-.chats-wrap { display: flex; gap: 16px; height: calc(100vh - 200px); min-height: 360px; }
+.chats-wrap { display: flex; gap: 16px; height: calc(100vh - 260px); min-height: 320px; }
 .chat-list { width: 260px; flex-shrink: 0; overflow-y: auto; }
 .chat-list::-webkit-scrollbar { width: 4px; }
 .chat-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 4px; }
@@ -259,16 +259,57 @@ header {
 .msg.me { align-self: flex-end; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 2px 12px rgba(109,40,217,.3); }
 .msg.them { align-self: flex-start; background: rgba(255,255,255,.07); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
 .msg-time { font-size: 10px; opacity: .5; margin-top: 4px; }
-.cw-input { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--border); background: rgba(6,4,15,.4); }
-.cw-input .inp { border-radius: 50px; padding: 12px 18px; }
 .chat-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sub); gap: 12px; font-size: 13.5px; border: 1px solid var(--border); border-radius: var(--r); background: rgba(10,7,22,.4); }
 
 /* Search result users */
 .user-search-result { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface); margin-top: 8px; cursor: pointer; transition: .2s; }
 .user-search-result:hover { border-color: rgba(139,92,246,.4); background: rgba(139,92,246,.06); }
 
+/* Global search bar */
+.global-search-wrap { position: relative; padding: 10px 18px; background: rgba(6,4,15,.7); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.global-search-inp { width: 100%; padding: 10px 16px 10px 40px; border-radius: 50px; border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; font-family: inherit; }
+.global-search-inp:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(139,92,246,.15); }
+.global-search-inp::placeholder { color: rgba(200,190,255,.3); }
+.global-search-icon { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-sub); }
+.global-search-results { position: absolute; top: calc(100% + 4px); left: 18px; right: 18px; z-index: 100; background: #0e0c1e; border: 1px solid var(--border-hi); border-radius: var(--r-sm); box-shadow: 0 12px 40px rgba(0,0,0,.6); max-height: 320px; overflow-y: auto; display: none; }
+.global-search-results.show { display: block; }
+.gsr-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background .15s; border-bottom: 1px solid var(--border); }
+.gsr-item:last-child { border-bottom: none; }
+.gsr-item:hover { background: rgba(139,92,246,.1); }
+.gsr-item .mini-ava { width: 38px; height: 38px; font-size: 14px; flex-shrink: 0; }
+.gsr-empty { padding: 20px; text-align: center; color: var(--text-sub); font-size: 13px; }
+
+/* Media in messages */
+.msg-img { max-width: 240px; max-height: 240px; border-radius: 12px; display: block; margin-top: 6px; cursor: pointer; object-fit: cover; }
+.msg-audio { margin-top: 6px; border-radius: 8px; width: 220px; display: block; }
+.msg-file { display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,.1); cursor: pointer; text-decoration: none; color: inherit; max-width: 240px; }
+.msg-file:hover { background: rgba(255,255,255,.16); }
+.msg-file-icon { font-size: 22px; flex-shrink: 0; }
+.msg-file-name { font-size: 12px; word-break: break-all; }
+
+/* Chat input toolbar */
+.cw-toolbar { display: flex; align-items: center; gap: 4px; padding: 0 14px 0 6px; border-top: 1px solid var(--border); background: rgba(6,4,15,.4); }
+.cw-toolbar-btn { width: 40px; height: 40px; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color .2s, background .2s; flex-shrink: 0; }
+.cw-toolbar-btn:hover { color: var(--violet-hi); background: rgba(139,92,246,.1); }
+.cw-input-row { display: flex; gap: 10px; padding: 10px 14px; background: rgba(6,4,15,.4); align-items: flex-end; }
+.cw-input-row .inp { border-radius: 50px; padding: 12px 18px; resize: none; min-height: 44px; }
+.cw-send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform .15s, box-shadow .15s; box-shadow: 0 4px 16px rgba(109,40,217,.4); }
+.cw-send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(109,40,217,.55); }
+.cw-send-btn:active { transform: scale(.95); }
+.cw-media-preview { padding: 8px 14px 0; display: flex; gap: 8px; flex-wrap: wrap; background: rgba(6,4,15,.4); }
+.cw-preview-item { position: relative; }
+.cw-preview-img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); }
+.cw-preview-file { width: 70px; height: 70px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,.06); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10px; color: var(--text-sub); overflow: hidden; padding: 4px; text-align: center; word-break: break-all; }
+.cw-preview-remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--rose); color: #fff; border: none; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+/* Lightbox */
+#lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.9); display: none; align-items: center; justify-content: center; }
+#lightbox.on { display: flex; }
+#lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 12px; }
+#lightboxClose { position: absolute; top: 20px; right: 24px; font-size: 32px; color: #fff; cursor: pointer; background: none; border: none; line-height: 1; }
+
 @media (max-width:720px) {
-  .chats-wrap { position: relative; height: calc(100vh - 210px); }
+  .chats-wrap { position: relative; height: calc(100vh - 270px); }
   .chat-list { width: 100%; }
   .chat-win, .chat-placeholder { position: absolute; inset: 0; transform: translateX(104%); transition: transform .3s ease; }
   .chat-win.mob-on { transform: translateX(0); }
@@ -346,6 +387,16 @@ header {
     <div class="header-logo syne">Mint <em>chat</em></div>
     <div class="header-avatar" id="headerAva" onclick="showView('profile');closeDrawer()">Г</div>
   </header>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox"><button id="lightboxClose" onclick="document.getElementById('lightbox').classList.remove('on')">✕</button><img id="lightboxImg" src="" alt=""></div>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="global-search-wrap">
+    <svg class="global-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="global-search-inp" type="text" id="globalSearchInp" placeholder="Найти пользователя…" autocomplete="off">
+    <div class="global-search-results" id="globalSearchResults"></div>
+  </div>
 
   <div id="overlay"></div>
 
@@ -474,9 +525,18 @@ header {
             </div>
           </div>
           <div class="cw-msgs" id="cwMsgs"></div>
-          <div class="cw-input">
+          <div class="cw-media-preview" id="cwMediaPreview" style="display:none;"></div>
+          <div class="cw-toolbar">
+            <input type="file" id="cwPhotoInput" accept="image/*" multiple hidden>
+            <input type="file" id="cwAudioInput" accept="audio/*" hidden>
+            <input type="file" id="cwFileInput" hidden>
+            <button class="cw-toolbar-btn" title="Фото" onclick="document.getElementById('cwPhotoInput').click()">🖼️</button>
+            <button class="cw-toolbar-btn" title="Музыка" onclick="document.getElementById('cwAudioInput').click()">🎵</button>
+            <button class="cw-toolbar-btn" title="Файл" onclick="document.getElementById('cwFileInput').click()">📎</button>
+          </div>
+          <div class="cw-input-row">
             <input class="inp" type="text" id="cwField" placeholder="Сообщение…" style="flex:1;">
-            <button class="btn teal sm" onclick="sendMsg()" style="border-radius:50%;width:44px;height:44px;padding:0;flex-shrink:0;">
+            <button class="cw-send-btn" onclick="sendMsg()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
@@ -562,7 +622,7 @@ header {
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, getDocs, addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, updateDoc, arrayUnion, arrayRemove, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { getStorage, ref, uploadString, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+import { getStorage, ref, uploadString, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
 /* ── CONFIG ── */
 const firebaseConfig = {
@@ -607,6 +667,8 @@ let activeChatId = null;
 let msgsUnsubscribe = null;
 let chatsUnsubscribe = null;
 let searchTimeout = null;
+let globalSearchTimeout = null;
+let pendingMedia = []; // [{file, type:'image'|'audio'|'file', previewUrl}]
 
 /* ── DRAWER ── */
 const menuBtn = document.getElementById('menuBtn');
@@ -824,7 +886,49 @@ window.onAvatarChosen = async function(e) {
   reader.readAsDataURL(file);
 };
 
-/* ── SEARCH USERS ── */
+/* ── GLOBAL SEARCH ── */
+async function doUserSearch(q, resultsEl, onClickFn) {
+  if (!q || q.length < 2) { resultsEl.innerHTML = ''; resultsEl.classList.remove('show'); return; }
+  if (!currentUser) { resultsEl.innerHTML = '<div class="gsr-empty">Войдите чтобы искать</div>'; resultsEl.classList.add('show'); return; }
+  const snap = await getDocs(query(
+    collection(db,'users'),
+    where('username','>=',q),
+    where('username','<=',q+'\uf8ff'),
+    limit(8)
+  ));
+  const filtered = snap.docs.filter(d => d.id !== currentUser.uid);
+  if (!filtered.length) { resultsEl.innerHTML = '<div class="gsr-empty">Пользователи не найдены</div>'; resultsEl.classList.add('show'); return; }
+  resultsEl.innerHTML = filtered.map(d => {
+    const u = d.data();
+    const avaHtml = u.avatar ? `<img src="${u.avatar}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : ini(u.username);
+    return `<div class="gsr-item" onclick="${onClickFn}('${d.id}','${esc(u.username)}')">
+      <div class="mini-ava" style="width:38px;height:38px;font-size:14px;">${avaHtml}</div>
+      <div><div class="item-name">${esc(u.username)}</div><div class="item-sub">${u.online?'<span style="color:var(--teal)">● В сети</span>':'Не в сети'}</div></div>
+    </div>`;
+  }).join('');
+  resultsEl.classList.add('show');
+}
+
+const globalInp = document.getElementById('globalSearchInp');
+const globalRes = document.getElementById('globalSearchResults');
+globalInp.addEventListener('input', () => {
+  clearTimeout(globalSearchTimeout);
+  const q = globalInp.value.trim().toLowerCase();
+  globalSearchTimeout = setTimeout(() => doUserSearch(q, globalRes, 'openChatFromSearch'), 300);
+});
+globalInp.addEventListener('keydown', e => { if (e.key === 'Escape') { globalInp.value=''; globalRes.innerHTML=''; globalRes.classList.remove('show'); } });
+document.addEventListener('click', e => { if (!e.target.closest('.global-search-wrap')) { globalRes.classList.remove('show'); } });
+
+window.openChatFromSearch = function(uid, name) {
+  globalInp.value = '';
+  globalRes.innerHTML = '';
+  globalRes.classList.remove('show');
+  showView('chats');
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.toggle('active', b.dataset.view==='chats'); });
+  startChatWith(uid, name);
+};
+
+/* ── SEARCH USERS (in chats tab) ── */
 window.searchUsers = function() {
   clearTimeout(searchTimeout);
   const q = document.getElementById('searchUserInp').value.trim().toLowerCase();
@@ -832,23 +936,16 @@ window.searchUsers = function() {
   if (!q || q.length < 2) { resultsEl.innerHTML = ''; return; }
   if (!currentUser) { resultsEl.innerHTML = '<div class="error-msg">Войдите чтобы искать пользователей</div>'; return; }
   searchTimeout = setTimeout(async () => {
-    const snap = await getDocs(query(
-      collection(db,'users'),
-      where('username','>=',q),
-      where('username','<=',q+'\uf8ff'),
-      limit(8)
-    ));
+    const snap = await getDocs(query(collection(db,'users'),where('username','>=',q),where('username','<=',q+'\uf8ff'),limit(8)));
     if (snap.empty) { resultsEl.innerHTML = '<div class="item-sub" style="padding:8px 4px;">Пользователи не найдены</div>'; return; }
-    resultsEl.innerHTML = snap.docs
-      .filter(d => d.id !== currentUser.uid)
-      .map(d => {
-        const u = d.data();
-        const avaHtml = u.avatar ? `<img src="${u.avatar}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : ini(u.username);
-        return `<div class="user-search-result" onclick="startChatWith('${d.id}','${esc(u.username)}')">
-          <div class="mini-ava" style="width:36px;height:36px;font-size:13px;">${avaHtml}</div>
-          <div><div class="item-name">${esc(u.username)}</div><div class="item-sub">${u.online?'<span style="color:var(--teal)">● В сети</span>':'Не в сети'}</div></div>
-        </div>`;
-      }).join('');
+    resultsEl.innerHTML = snap.docs.filter(d=>d.id!==currentUser.uid).map(d=>{
+      const u=d.data();
+      const avaHtml=u.avatar?`<img src="${u.avatar}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:ini(u.username);
+      return `<div class="user-search-result" onclick="startChatWith('${d.id}','${esc(u.username)}')">
+        <div class="mini-ava" style="width:36px;height:36px;font-size:13px;">${avaHtml}</div>
+        <div><div class="item-name">${esc(u.username)}</div><div class="item-sub">${u.online?'<span style="color:var(--teal)">● В сети</span>':'Не в сети'}</div></div>
+      </div>`;
+    }).join('');
   }, 350);
 };
 
@@ -939,10 +1036,16 @@ window.openChat = async function(chatId, otherName, otherId) {
     box.innerHTML = snap.docs.map(d => {
       const m = d.data();
       const isMe = m.uid === currentUser.uid;
-      return `<div class="msg ${isMe?'me':'them'}">
-        ${esc(m.text)}
-        <div class="msg-time">${fmtTime(m.createdAt)}</div>
-      </div>`;
+      let mediaHtml = '';
+      if (m.mediaType === 'image' && m.mediaUrl) {
+        mediaHtml = `<img class="msg-img" src="${m.mediaUrl}" alt="фото" onclick="openLightbox('${m.mediaUrl}')">`;
+      } else if (m.mediaType === 'audio' && m.mediaUrl) {
+        mediaHtml = `<audio class="msg-audio" controls src="${m.mediaUrl}"></audio>`;
+      } else if (m.mediaType === 'file' && m.mediaUrl) {
+        mediaHtml = `<a class="msg-file" href="${m.mediaUrl}" target="_blank" download="${esc(m.fileName||'файл')}"><span class="msg-file-icon">📄</span><span class="msg-file-name">${esc(m.fileName||'Скачать файл')}</span></a>`;
+      }
+      const textHtml = m.text ? `<div>${esc(m.text)}</div>` : '';
+      return `<div class="msg ${isMe?'me':'them'}">${textHtml}${mediaHtml}<div class="msg-time">${fmtTime(m.createdAt)}</div></div>`;
     }).join('');
     box.scrollTop = box.scrollHeight;
   });
@@ -950,18 +1053,97 @@ window.openChat = async function(chatId, otherName, otherId) {
 
 window.closeChatMob = function() { document.getElementById('chatWindow').classList.remove('mob-on'); };
 
+/* ── MEDIA ATTACH ── */
+function renderMediaPreviews() {
+  const wrap = document.getElementById('cwMediaPreview');
+  if (!pendingMedia.length) { wrap.style.display='none'; wrap.innerHTML=''; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = pendingMedia.map((item,i) => {
+    let inner = '';
+    if (item.type === 'image') {
+      inner = `<img class="cw-preview-img" src="${item.previewUrl}" alt="">`;
+    } else if (item.type === 'audio') {
+      inner = `<div class="cw-preview-file">🎵<span>${esc(item.file.name).substring(0,18)}</span></div>`;
+    } else {
+      inner = `<div class="cw-preview-file">📄<span>${esc(item.file.name).substring(0,18)}</span></div>`;
+    }
+    return `<div class="cw-preview-item">${inner}<button class="cw-preview-remove" onclick="removeMedia(${i})">✕</button></div>`;
+  }).join('');
+}
+
+window.removeMedia = function(i) { pendingMedia.splice(i,1); renderMediaPreviews(); };
+
+document.getElementById('cwPhotoInput').addEventListener('change', e => {
+  Array.from(e.target.files).forEach(file => {
+    const url = URL.createObjectURL(file);
+    pendingMedia.push({file, type:'image', previewUrl:url});
+  });
+  e.target.value = '';
+  renderMediaPreviews();
+});
+document.getElementById('cwAudioInput').addEventListener('change', e => {
+  Array.from(e.target.files).forEach(file => pendingMedia.push({file, type:'audio', previewUrl:null}));
+  e.target.value = '';
+  renderMediaPreviews();
+});
+document.getElementById('cwFileInput').addEventListener('change', e => {
+  Array.from(e.target.files).forEach(file => pendingMedia.push({file, type:'file', previewUrl:null}));
+  e.target.value = '';
+  renderMediaPreviews();
+});
+
 /* ── SEND MESSAGE ── */
 window.sendMsg = async function() {
   if (!currentUser || !activeChatId) return;
   const f    = document.getElementById('cwField');
-  const text = f.value.trim(); if (!text) return;
+  const text = f.value.trim();
+  if (!text && !pendingMedia.length) return;
   f.value = '';
-  const msgData = { uid: currentUser.uid, text, createdAt: serverTimestamp() };
-  await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
-  await updateDoc(doc(db,'chats',activeChatId), { lastMessage: text, lastAt: serverTimestamp() });
+
+  const mediaCopy = [...pendingMedia];
+  pendingMedia = [];
+  renderMediaPreviews();
+
+  // Send text message
+  if (text) {
+    const msgData = { uid: currentUser.uid, text, createdAt: serverTimestamp() };
+    await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
+    await updateDoc(doc(db,'chats',activeChatId), { lastMessage: text, lastAt: serverTimestamp() });
+  }
+
+  // Send media
+  for (const item of mediaCopy) {
+    try {
+      const ext = item.file.name.split('.').pop();
+      const storageRef = ref(storage, `chats/${activeChatId}/${Date.now()}_${item.file.name}`);
+      await uploadBytes(storageRef, item.file);
+      const mediaUrl = await getDownloadURL(storageRef);
+      const msgData = {
+        uid: currentUser.uid,
+        text: '',
+        mediaType: item.type,
+        mediaUrl,
+        fileName: item.file.name,
+        createdAt: serverTimestamp()
+      };
+      await addDoc(collection(db,'chats',activeChatId,'messages'), msgData);
+      const preview = item.type==='image' ? '📷 Фото' : item.type==='audio' ? '🎵 Аудио' : `📄 ${item.file.name}`;
+      await updateDoc(doc(db,'chats',activeChatId), { lastMessage: preview, lastAt: serverTimestamp() });
+    } catch(err) {
+      console.error('Media upload error:', err);
+    }
+  }
 };
 
-document.getElementById('cwField').addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+window.openLightbox = function(url) {
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').classList.add('on');
+};
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('on');
+});
+
+document.getElementById('cwField').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) sendMsg(); });
 
 /* ── CHANNELS (Firestore) ── */
 window.createChannel = async function() {
